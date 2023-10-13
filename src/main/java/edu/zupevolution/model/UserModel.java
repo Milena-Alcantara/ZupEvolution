@@ -26,6 +26,6 @@ public class UserModel {
     private String email;
     @OneToOne
     @JoinColumn(name = "id_access_type", referencedColumnName = "id", nullable = false)
-    private AccesTypeModel access_type;
+    private AccessTypeModel access_type;
 
 }
