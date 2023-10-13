@@ -24,8 +24,8 @@ public class UserModel {
     private Date birthday;
     @Column(name = "email", nullable = false)
     private String email;
-    @Column(name = "access_type", nullable = false)
-    @OneToOne(mappedBy = "id_accessType")
+    @OneToOne
+    @JoinColumn(name = "id_access_type", referencedColumnName = "id", nullable = false)
     private Long access_type;
 
 }
