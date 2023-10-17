@@ -16,20 +16,34 @@ import java.util.List;
 @NoArgsConstructor
 public class ProfessionalProfileModel {
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @OneToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id")
     private UserModel userModel;
-    @Column(name = "soft_skills")
+
+    @ElementCollection
+    @CollectionTable(name = "soft_skills", joinColumns = @JoinColumn(name = "professional_profile_id"))
     private List<String> softSkills;
-    @OneToMany(mappedBy = "hard_skills")
+
+    @ManyToMany
+    @JoinTable(
+            name = "profile_hard_skills",
+            joinColumns = @JoinColumn(name = "id_profile"),
+            inverseJoinColumns = @JoinColumn(name = "id_skill")
+    )
     private List<HardSkillsModel> hardSkills;
+
     @Column(name = "description")
     private String description;
-    @Column(name = "strong_points")
+
+    @ElementCollection
+    @CollectionTable(name = "strong_points", joinColumns = @JoinColumn(name = "professional_profile_id"))
     private List<String> strongPoints;
-    @Column(name = "improvement_points")
+
+    @ElementCollection
+    @CollectionTable(name = "improvement_points", joinColumns = @JoinColumn(name = "professional_profile_id"))
     private List<String> improvementPoints;
 
 }
