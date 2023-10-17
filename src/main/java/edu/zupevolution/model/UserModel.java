@@ -13,17 +13,21 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_users")
+@Table(name = "users")
 public class UserModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "name", nullable = false)
     private String name;
+
     @Column(name = "birthday", nullable = false)
     private Date birthday;
+
     @Column(name = "email", nullable = false)
     private String email;
+
     @OneToOne
     @JoinColumn(name = "id_access_type", referencedColumnName = "id", nullable = false)
     private AccessTypeModel access_type;

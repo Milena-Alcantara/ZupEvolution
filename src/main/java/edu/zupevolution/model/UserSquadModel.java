@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_user_squad")
+@Table(name = "user_squad")
 public class UserSquadModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

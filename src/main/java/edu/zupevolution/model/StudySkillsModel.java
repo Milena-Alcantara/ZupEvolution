@@ -17,9 +17,11 @@ public class StudySkillsModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "id_hard_skills", referencedColumnName = "id", nullable = false)
     private HardSkillsModel hardSkills;
+
     @ManyToOne
     @JoinColumn(name = "id_study", referencedColumnName = "id", nullable = false)
     private StudyModel study;

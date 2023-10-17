@@ -13,18 +13,24 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "soft_skills")
+@Table(name = "hard_skills")
 public class HardSkillsModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn (name = "id_professional_profile", referencedColumnName = "id", nullable = false)
     private ProfessionalProfileModel professionalProfile;
+
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "certificate_url", nullable = false)
+
+    @ElementCollection
+    @CollectionTable(name = "certificates_urls", joinColumns = @JoinColumn(name = "hard_skills_id"))
     private List<String>certificate;
-    @Column(name = "desired_courses", nullable = false)
+
+    @ElementCollection
+    @CollectionTable(name = "desired_courses", joinColumns = @JoinColumn(name = "hard_skills_id"))
     private List<String>desiredCourses;
 }
