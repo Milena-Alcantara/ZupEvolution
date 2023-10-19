@@ -28,8 +28,11 @@ public class UserModel {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "password",length = 30)
+    private String password;
+
     @OneToOne
-    @JoinColumn(name = "id_access_type", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_access_type", referencedColumnName = "id", nullable = true)
     private AccessTypeModel access_type;
 
 }
