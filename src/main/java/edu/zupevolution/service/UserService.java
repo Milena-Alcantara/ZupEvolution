@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.swing.text.html.parser.Entity;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -51,4 +52,12 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail inválido.");
     }
 
+    public ResponseEntity<Object> getAllStudies() {
+        List<UserModel> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(users);
+        }
+    }
 }

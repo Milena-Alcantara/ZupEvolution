@@ -54,6 +54,19 @@ class PersonalProfileServiceTest {
         verify(userRepository, times(1)).save(existingUser);
     }
     @Test
+    @DisplayName("deve retornar NOT_FOUND quando o perfil do usuário não é encontrado")
+    public void testPutPersonalProfileNotFound() {
+        Long userId = 2L;
+        UserModel updatedUserModel = new UserModel();
+        updatedUserModel.setPassword("newPassword");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        ResponseEntity<Object> responseEntity = personalProfileService.updatePersonalProfile(userId, updatedUserModel);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Usuário não encontrado com o ID fornecido.", responseEntity.getBody());
+    }
+    @Test
     @DisplayName("deve retornar o perfil do usuário")
     public void testGetPersonalProfile() {
         long userId = 1L;
