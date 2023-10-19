@@ -1,7 +1,7 @@
 package edu.zupevolution.service;
 
 import edu.zupevolution.model.StudyModel;
-import edu.zupevolution.teste.StudyRepository;
+import edu.zupevolution.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

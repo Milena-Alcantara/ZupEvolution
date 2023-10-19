@@ -1,7 +1,7 @@
 package edu.zupevolution.service;
 
 import edu.zupevolution.model.StudyModel;
-import edu.zupevolution.teste.StudyRepository;
+import edu.zupevolution.repository.StudyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
