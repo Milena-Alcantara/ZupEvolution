@@ -28,4 +28,13 @@ public class PersonalProfileService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado com o ID fornecido.");
         }
     }
+    public ResponseEntity<Object> getPersonalProfile(Long id) {
+        Optional<UserModel> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            UserModel user = userOptional.get();
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado com o ID fornecido.");
+        }
+    }
 }
