@@ -1,4 +1,4 @@
-package edu.zupevolution.teste;
+package edu.zupevolution.repository;
 
 import edu.zupevolution.model.StudyModel;
 import org.springframework.data.jpa.repository.JpaRepository;
