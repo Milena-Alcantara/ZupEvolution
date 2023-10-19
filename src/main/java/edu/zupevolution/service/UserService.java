@@ -3,15 +3,13 @@ package edu.zupevolution.service;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.swing.text.html.parser.Entity;
+
+
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -27,7 +25,6 @@ public class UserService {
         }
        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário salvo com sucesso.");
     }
-
     private boolean dataValidate(UserModel userModel) {
         String EMAIL_PATTERN =
                 "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
@@ -39,7 +36,6 @@ public class UserService {
         }
         return true;
     }
-
     public ResponseEntity<Object> deleteUser(String email){
         if (email!=null){
             if (userRepository.findByEmailContaining(email) != null){
@@ -50,5 +46,14 @@ public class UserService {
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail inválido.");
     }
-
+    public ResponseEntity<Object> findUserByEmail(String email){
+        if (email!=null){
+            Optional<UserModel> locatedUser = userRepository.findByEmailContaining(email);
+            if (locatedUser !=null)
+                return  ResponseEntity.ok(locatedUser.get());
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail inválido.");
+    }
 }

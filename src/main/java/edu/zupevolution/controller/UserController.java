@@ -19,4 +19,9 @@ public class UserController {
     public ResponseEntity<Object> deleteUser(@PathVariable String email){
         return userService.deleteUser(email);
     }
+
+    @GetMapping("/getUser/{email}")
+    public ResponseEntity<Object> findUserByEmail(@PathVariable String email){
+        return userService.findUserByEmail(email);
+    }
 }
