@@ -15,4 +15,8 @@ public class PersonalProfileController {
     public ResponseEntity<Object> updateProfessionalProfile(@PathVariable Long id, @RequestBody UserModel updatedUserModel) {
         return personalProfileService.updatePersonalProfile(id, updatedUserModel);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getProfessionalProfile(@PathVariable Long id) {
+        return personalProfileService.getPersonalProfile(id);
+    }
 }
