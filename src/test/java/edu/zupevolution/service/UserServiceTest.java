@@ -13,7 +13,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,6 +111,30 @@ public class UserServiceTest {
     public void testThreeFindUserByEmail(){
         when(userRepository.findByEmailContaining(userValid.getEmail())).thenReturn(null);
         ResponseEntity response = userService.findUserByEmail(userValid.getEmail());
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Usuário não localizado.", response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status OK quando houver usuários")
+    public void testGetAllStudiesNotEmpty() {
+        List<UserModel> users = new ArrayList<>();
+        users.add(new UserModel(1L, "Usuário 1", new Date(), "usuario1@gmail.com", "senha1", null));
+        when(userRepository.findAll()).thenReturn(users);
+
+        ResponseEntity<Object> response = userService.getAllStudies();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<UserModel> responseUsers = (List<UserModel>) response.getBody();
+
+        assertEquals(users.size(), responseUsers.size());
+        assertEquals(users.get(0).getId(), responseUsers.get(0).getId());
+        assertEquals(users.get(0).getName(), responseUsers.get(0).getName());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não houver usuários")
+    public void testGetAllStudiesEmpty() {
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        ResponseEntity<Object> response = userService.getAllStudies();
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Usuário não localizado.", response.getBody());
