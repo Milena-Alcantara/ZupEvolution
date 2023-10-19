@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 public class PersonalProfileController {
     @Autowired
     private PersonalProfileService personalProfileService;
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateProfessionalProfile(@PathVariable Long id, @RequestBody UserModel updatedUserModel) {
         return personalProfileService.updatePersonalProfile(id, updatedUserModel);
     }
-    @GetMapping("/{id}")
+    @GetMapping("/getAll/{id}")
     public ResponseEntity<Object> getProfessionalProfile(@PathVariable Long id) {
         return personalProfileService.getPersonalProfile(id);
     }
