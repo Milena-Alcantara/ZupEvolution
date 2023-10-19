@@ -41,4 +41,8 @@ public class StudyController {
             return new ResponseEntity<>(response.getBody(), HttpStatus.NOT_FOUND);
         }
     }
+    @GetMapping("/getAll")
+    public ResponseEntity<Object> getAllStudies() {
+        return studyService.getAllStudies();
+    }
 }
