@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -53,6 +54,33 @@ public class UserServiceTest {
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("Verifique os dados informados.", response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status OK ao tentar deletar um usuário com email válido")
+    public void testOneDeleteUser(){
+        when(userRepository.findByEmailContaining(userValid.getEmail())).thenReturn(Optional.ofNullable(userValid));
+        ResponseEntity response = userService.deleteUser(userValid.getEmail());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Usuário deletado.", response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status CONFLIT ao tentar deletar um usuário com email inválido")
+    public void testTwoDeleteUser(){
+        when(userRepository.findByEmailContaining(userInvalid.getEmail())).thenReturn(Optional.ofNullable(userInvalid));
+        ResponseEntity response = userService.deleteUser(userInvalid.getEmail());
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("E-mail inválido.", response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status NOT_FOUND ao tentar deletar um usuário com email inválido")
+    public void testThreeDeleteUser(){
+        when(userRepository.findByEmailContaining(userValid.getEmail())).thenReturn(null);
+        ResponseEntity response = userService.deleteUser(userValid.getEmail());
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Usuário não localizado.", response.getBody());
     }
 
 

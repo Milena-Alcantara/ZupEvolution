@@ -3,11 +3,16 @@ package edu.zupevolution.service;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.swing.text.html.parser.Entity;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -34,4 +39,16 @@ public class UserService {
         }
         return true;
     }
+
+    public ResponseEntity<Object> deleteUser(String email){
+        if (email!=null){
+            if (userRepository.findByEmailContaining(email) != null){
+                return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado.");
+            }else {
+              return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail inválido.");
+    }
+
 }
