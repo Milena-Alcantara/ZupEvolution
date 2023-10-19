@@ -117,7 +117,7 @@ public class UserServiceTest {
     }
     @Test
     @DisplayName("Deve retornar um HTTP status OK quando houver usuários")
-    public void testGetAllStudiesNotEmpty() {
+    public void testGetAllUsersNotEmpty() {
         List<UserModel> users = new ArrayList<>();
         users.add(new UserModel(1L, "Usuário 1", new Date(), "usuario1@gmail.com", "senha1", null));
         when(userRepository.findAll()).thenReturn(users);
@@ -132,7 +132,7 @@ public class UserServiceTest {
     }
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não houver usuários")
-    public void testGetAllStudiesEmpty() {
+    public void testGetAllUsersEmpty() {
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
         ResponseEntity<Object> response = userService.getAllStudies();
 

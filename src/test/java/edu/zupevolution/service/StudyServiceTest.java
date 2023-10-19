@@ -13,10 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -230,5 +227,26 @@ class StudyServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+    @Test
+    @DisplayName("deve retornar a lista de estudos existentes")
+    public void testGetAllStudies() {
+        List<StudyModel> existingStudies = new ArrayList<>();
+        existingStudies.add(new StudyModel());
+        existingStudies.add(new StudyModel());
 
+        when(studyRepository.findAll()).thenReturn(existingStudies);
+
+        ResponseEntity<Object> response = studyService.getAllStudies();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(existingStudies.size(), ((List<StudyModel>) response.getBody()).size());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não houver estudos")
+    public void testGetAllStudiesEmpty() {
+        when(studyRepository.findAll()).thenReturn(new ArrayList<>());
+        ResponseEntity<Object> response = studyService.getAllStudies();
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Estudo não encontrado.", response.getBody());
+    }
 }

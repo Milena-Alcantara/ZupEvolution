@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -81,5 +82,12 @@ public class StudyService {
             return new ResponseEntity<>("Estudo não encontrado.", HttpStatus.NOT_FOUND);
         }
     }
-
+    public ResponseEntity<Object> getAllStudies() {
+        List<StudyModel> studies = studyRepository.findAll();
+        if (studies.isEmpty()) {
+            return new ResponseEntity<>("Estudo não encontrado.", HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(studies, HttpStatus.OK);
+        }
+    }
 }
