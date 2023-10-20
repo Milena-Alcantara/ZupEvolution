@@ -19,13 +19,12 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // olhar esse método e os testes
     public ResponseEntity<Object> createUser(@RequestBody UserModel userModel){
         if (dataValidate(userModel)) {
             userRepository.save(userModel);
-           return ResponseEntity.status(HttpStatus.CONFLICT).body("Verifique os dados informados.");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário salvo com sucesso.");
         }
-       return ResponseEntity.status(HttpStatus.CREATED).body("Usuário salvo com sucesso.");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Verifique os dados informados.");
     }
     private boolean dataValidate(UserModel userModel) {
         String EMAIL_PATTERN =
