@@ -12,10 +12,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ProfessionalProfileServiceTest {
     @Mock
@@ -52,5 +55,46 @@ class ProfessionalProfileServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
         assertEquals("É necessário associar um usuário ao seu perfil profissional.",response.getBody());
     }
+    @Test
+    void testGetAllProfessionalProfilesWhenProfilesExist() {
+        // Cria uma lista de perfis
+        ProfessionalProfileModel profile1 = new ProfessionalProfileModel();
+        profile1.setId(1L);
+        ProfessionalProfileModel profile2 = new ProfessionalProfileModel();
+        profile2.setId(2L);
+        List<ProfessionalProfileModel> profiles = Arrays.asList(profile1, profile2);
 
+        // Simula o comportamento do repositório quando perfis existem
+        when(repository.findAll()).thenReturn(profiles);
+
+        // Chama o método a ser testado
+        ResponseEntity<Object> responseEntity = profileService.getAllProfessionalProfiles();
+
+        // Verifica se a resposta tem o status esperado e contém a lista de perfis
+        assert(responseEntity.getStatusCodeValue() == 200);
+        assert(responseEntity.getBody() instanceof List);
+        List<ProfessionalProfileModel> returnedProfiles = (List<ProfessionalProfileModel>) responseEntity.getBody();
+        assert(returnedProfiles.size() == 2);
+        assert(returnedProfiles.get(0).getId() == 1L);
+        assert(returnedProfiles.get(1).getId() == 2L);
+
+        // Verifica se o método findAll do repositório foi chamado
+        verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    void testGetAllProfessionalProfilesWhenNoProfilesExist() {
+        // Simula o comportamento do repositório quando não existem perfis
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+
+        // Chama o método a ser testado
+        ResponseEntity<Object> responseEntity = profileService.getAllProfessionalProfiles();
+
+        // Verifica se a resposta tem o status esperado e contém a mensagem de erro
+        assert(responseEntity.getStatusCodeValue() == 404);
+        assert(responseEntity.getBody().equals("Nenhum perfil profissional encontrado."));
+
+        // Verifica se o método findAll do repositório foi chamado
+        verify(repository, times(1)).findAll();
+    }
 }

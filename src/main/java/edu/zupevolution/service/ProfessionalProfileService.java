@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 @Service
 public class ProfessionalProfileService {
     @Autowired
@@ -21,4 +23,12 @@ public class ProfessionalProfileService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("É necessário associar um usuário ao seu perfil profissional.");
     }
 
+    public ResponseEntity<Object> getAllProfessionalProfiles() {
+        List<ProfessionalProfileModel> profiles = professionalRepository.findAll();
+        if (!profiles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(profiles);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum perfil profissional encontrado.");
+        }
+    }
 }
