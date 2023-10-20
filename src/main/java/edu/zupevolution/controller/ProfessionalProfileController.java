@@ -20,4 +20,14 @@ public class ProfessionalProfileController {
     public ResponseEntity<Object> getProfessionalProfile() {
         return profileService.getAllProfessionalProfiles();
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> updateProfessionalProfile(@PathVariable Long id, @RequestBody ProfessionalProfileModel updatedProfileModel) {
+        return profileService.updateProfessionalProfile(id, updatedProfileModel);
+    }
+
+    @PutMapping("/updatehardskil")
+    public ResponseEntity<Object> updateHardSkillName(@RequestBody ProfessionalProfileModel updatedProfileModel, @RequestBody String profileHardSkillName, @RequestBody String newHardSkillName) {
+        return profileService.updateHardSkillName(updatedProfileModel, profileHardSkillName, newHardSkillName);
+    }
 }

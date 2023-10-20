@@ -1,7 +1,9 @@
 package edu.zupevolution.service;
 
+import edu.zupevolution.model.HardSkillsModel;
 import edu.zupevolution.model.ProfessionalProfileModel;
 import edu.zupevolution.model.UserModel;
+import edu.zupevolution.repository.HardSkillsRepository;
 import edu.zupevolution.repository.ProfessionalProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,10 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,6 +22,8 @@ import static org.mockito.Mockito.*;
 class ProfessionalProfileServiceTest {
     @Mock
     private ProfessionalProfileRepository repository;
+    @Mock
+    private HardSkillsRepository hardSkillsRepository;
     @InjectMocks
     private ProfessionalProfileService profileService;
     private UserModel userValid;
@@ -56,21 +57,18 @@ class ProfessionalProfileServiceTest {
         assertEquals("É necessário associar um usuário ao seu perfil profissional.",response.getBody());
     }
     @Test
+    @DisplayName("Deve obter todos os perfis profissionais quando existem perfis")
     void testGetAllProfessionalProfilesWhenProfilesExist() {
-        // Cria uma lista de perfis
         ProfessionalProfileModel profile1 = new ProfessionalProfileModel();
         profile1.setId(1L);
         ProfessionalProfileModel profile2 = new ProfessionalProfileModel();
         profile2.setId(2L);
         List<ProfessionalProfileModel> profiles = Arrays.asList(profile1, profile2);
 
-        // Simula o comportamento do repositório quando perfis existem
         when(repository.findAll()).thenReturn(profiles);
 
-        // Chama o método a ser testado
         ResponseEntity<Object> responseEntity = profileService.getAllProfessionalProfiles();
 
-        // Verifica se a resposta tem o status esperado e contém a lista de perfis
         assert(responseEntity.getStatusCodeValue() == 200);
         assert(responseEntity.getBody() instanceof List);
         List<ProfessionalProfileModel> returnedProfiles = (List<ProfessionalProfileModel>) responseEntity.getBody();
@@ -78,23 +76,122 @@ class ProfessionalProfileServiceTest {
         assert(returnedProfiles.get(0).getId() == 1L);
         assert(returnedProfiles.get(1).getId() == 2L);
 
-        // Verifica se o método findAll do repositório foi chamado
         verify(repository, times(1)).findAll();
     }
 
     @Test
+    @DisplayName("Deve retornar HTTP status NOT_FOUND quando não existem perfis profissionais")
     void testGetAllProfessionalProfilesWhenNoProfilesExist() {
-        // Simula o comportamento do repositório quando não existem perfis
         when(repository.findAll()).thenReturn(Collections.emptyList());
-
-        // Chama o método a ser testado
         ResponseEntity<Object> responseEntity = profileService.getAllProfessionalProfiles();
 
-        // Verifica se a resposta tem o status esperado e contém a mensagem de erro
         assert(responseEntity.getStatusCodeValue() == 404);
         assert(responseEntity.getBody().equals("Nenhum perfil profissional encontrado."));
 
-        // Verifica se o método findAll do repositório foi chamado
         verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve atualizar o perfil profissional quando o perfil existe")
+    void testUpdateProfessionalProfileWhenProfileExists() {
+        ProfessionalProfileModel existingProfile = new ProfessionalProfileModel();
+        existingProfile.setId(1L);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existingProfile));
+
+        ProfessionalProfileModel updatedProfile = new ProfessionalProfileModel();
+        updatedProfile.setSoftSkills(Collections.singletonList("Java, Spring"));
+        updatedProfile.setDescription("Experienced Java Developer");
+        updatedProfile.setStrongPoints(Collections.singletonList("Problem-solving, Teamwork"));
+        updatedProfile.setImprovementPoints(Collections.singletonList("Data Structures, Algorithms"));
+
+        ResponseEntity<Object> responseEntity = profileService.updateProfessionalProfile(1L, updatedProfile);
+
+        assert(responseEntity.getStatusCodeValue() == 200);
+        assert(responseEntity.getBody().equals("Perfil profissional atualizado com sucesso."));
+        verify(repository, times(1)).save(existingProfile);
+    }
+
+    @Test
+    @DisplayName("Deve retornar HTTP status NOT_FOUND ao tentar atualizar um perfil inexistente")
+    void testUpdateProfessionalProfileWhenProfileDoesNotExist() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        ProfessionalProfileModel updatedProfile = new ProfessionalProfileModel();
+        updatedProfile.setSoftSkills(Collections.singletonList("Java, Spring"));
+        updatedProfile.setDescription("Experienced Java Developer");
+        updatedProfile.setStrongPoints(Collections.singletonList("Problem-solving, Teamwork"));
+        updatedProfile.setImprovementPoints(Collections.singletonList("Data Structures, Algorithms"));
+
+        ResponseEntity<Object> responseEntity = profileService.updateProfessionalProfile(1L, updatedProfile);
+
+        assert(responseEntity.getStatusCodeValue() == 404);
+        assert(responseEntity.getBody().equals("Perfil profissional não encontrado."));
+        verify(repository, never()).save(any());
+    }
+
+
+    @Test
+    @DisplayName("Deve atualizar o nome da habilidade quando os nomes são válidos")
+    void testUpdateHardSkillNameValidSkills() {
+        ProfessionalProfileModel professionalProfile = new ProfessionalProfileModel();
+        List<HardSkillsModel> hardSkillsList = new ArrayList<>();
+        HardSkillsModel hardSkill = new HardSkillsModel();
+        hardSkill.setName("Java");
+        hardSkillsList.add(hardSkill);
+        professionalProfile.setHardSkills(hardSkillsList);
+
+        when(hardSkillsRepository.save(any(HardSkillsModel.class))).thenReturn(hardSkill);
+
+        ResponseEntity<Object> response = profileService.updateHardSkillName(professionalProfile, "Java", "Python");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Python", ((HardSkillsModel) response.getBody()).getName());
+
+        verify(hardSkillsRepository, times(1)).save(any(HardSkillsModel.class));
+    }
+
+    @Test
+    @DisplayName("Deve retornar HTTP status BAD_REQUEST ao tentar atualizar com nomes de habilidade inválidos")
+    void testUpdateHardSkillNameInvalidSkills() {
+        ProfessionalProfileModel professionalProfile = new ProfessionalProfileModel();
+
+        ResponseEntity<Object> response = profileService.updateHardSkillName(professionalProfile, null, "Python");
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Nomes de habilidade inválidos.", response.getBody());
+
+        verify(hardSkillsRepository, never()).save(any(HardSkillsModel.class));
+    }
+
+    @Test
+    @DisplayName("Deve retornar HTTP 404 Not Found ao tentar atualizar uma habilidade não existente")
+    void testUpdateHardSkillNameNotFound() {
+        ProfessionalProfileModel professionalProfile = new ProfessionalProfileModel();
+        List<HardSkillsModel> hardSkillsList = new ArrayList<>();
+        HardSkillsModel hardSkill = new HardSkillsModel();
+        hardSkill.setName("Java");
+        hardSkillsList.add(hardSkill);
+        professionalProfile.setHardSkills(hardSkillsList);
+
+        when(hardSkillsRepository.save(hardSkill)).thenReturn(hardSkill);
+        ResponseEntity<Object> response = profileService.updateHardSkillName(professionalProfile, "Python", "NewSkill");
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Habilidade não encontrada.", response.getBody());
+    }
+
+    @Test
+    @DisplayName("Deve retornar true para nomes de habilidade válidos")
+    void testValidateHardSkillNamesValidSkills() {
+        boolean isValid = profileService.validateAndUpdateHardSkill("Java", "Python");
+        assertTrue(isValid);
+    }
+
+    @Test
+    @DisplayName("Deve retornar false para nomes de habilidade inválidos")
+    void testValidateHardSkillNamesInvalidSkills() {
+        boolean isValid = profileService.validateAndUpdateHardSkill(null, "Python");
+        assertFalse(isValid);
     }
 }
