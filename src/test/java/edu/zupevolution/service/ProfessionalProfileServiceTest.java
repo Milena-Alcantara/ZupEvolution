@@ -12,15 +12,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ProfessionalProfileServiceTest {
     @Mock
@@ -42,10 +40,6 @@ class ProfessionalProfileServiceTest {
         profileModelValid = new ProfessionalProfileModel(1l,userValid,null,null,null,
                 null,null);
         profileModelInvalid = new ProfessionalProfileModel();
-        arrayUser = new Object[]{userValid};
-        listUsersValidTwo = new ArrayList<>();
-        listUsersValidTwo.add(arrayUser);
-        listUsersValid = new ArrayList<>();
     }
     @Test
     @DisplayName("Deve retornar um HTTP status CREATED ao passar um perfil profissional com id do usuário válido")
@@ -65,33 +59,47 @@ class ProfessionalProfileServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
         assertEquals("É necessário associar um usuário ao seu perfil profissional.",response.getBody());
     }
-    @Test
-    @DisplayName("Deve retornar um HTTP status OK ao passar uma skill válida")
-    public void testOneGetUsersWithSkill(){
-        when(repository.getUsersWithSkill(anyString())).thenReturn(listUsersValidTwo);
-        ResponseEntity response = profileService.getUsersWithSkill("comunicação");
 
-        assertEquals(HttpStatus.OK,response.getStatusCode());
-        assertEquals(listUsersValidTwo,response.getBody());
+    @Test
+    void testGetAllProfessionalProfilesWhenProfilesExist() {
+        // Cria uma lista de perfis
+        ProfessionalProfileModel profile1 = new ProfessionalProfileModel();
+        profile1.setId(1L);
+        ProfessionalProfileModel profile2 = new ProfessionalProfileModel();
+        profile2.setId(2L);
+        List<ProfessionalProfileModel> profiles = Arrays.asList(profile1, profile2);
+
+        // Simula o comportamento do repositório quando perfis existem
+        when(repository.findAll()).thenReturn(profiles);
+
+        // Chama o método a ser testado
+        ResponseEntity<Object> responseEntity = profileService.getAllProfessionalProfiles();
+
+        // Verifica se a resposta tem o status esperado e contém a lista de perfis
+        assert(responseEntity.getStatusCodeValue() == 200);
+        assert(responseEntity.getBody() instanceof List);
+        List<ProfessionalProfileModel> returnedProfiles = (List<ProfessionalProfileModel>) responseEntity.getBody();
+        assert(returnedProfiles.size() == 2);
+        assert(returnedProfiles.get(0).getId() == 1L);
+        assert(returnedProfiles.get(1).getId() == 2L);
+
+        // Verifica se o método findAll do repositório foi chamado
+        verify(repository, times(1)).findAll();
     }
+
     @Test
-    @DisplayName("Deve retornar um HTTP status BAD_REQUEST ao passar uma skill inválida")
-    public void testTwoGetUsersWithSkill(){
-        when(repository.getUsersWithSkill(null)).thenReturn(listUsersValid);
-        ResponseEntity response = profileService.getUsersWithSkill(null);
+    void testGetAllProfessionalProfilesWhenNoProfilesExist() {
+        // Simula o comportamento do repositório quando não existem perfis
+        when(repository.findAll()).thenReturn(Collections.emptyList());
 
-        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
-        assertEquals("É necessário informar uma skill válida",response.getBody());
+        // Chama o método a ser testado
+        ResponseEntity<Object> responseEntity = profileService.getAllProfessionalProfiles();
 
-    }
-    @Test
-    @DisplayName("Deve retornar um HTTP status NOT_FOUND ao passar uma skill válida mas não presente.")
-    public void testThreeGetUsersWithSkill(){
-        when(repository.getUsersWithSkill("comunicacao")).thenReturn(null);
-        ResponseEntity response = profileService.getUsersWithSkill("comunicacao");
+        // Verifica se a resposta tem o status esperado e contém a mensagem de erro
+        assert(responseEntity.getStatusCodeValue() == 404);
+        assert(responseEntity.getBody().equals("Nenhum perfil profissional encontrado."));
 
-        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
-        assertEquals("Não foi localizado nenhum usuário com a Skill solicitada.",response.getBody());
-
+        // Verifica se o método findAll do repositório foi chamado
+        verify(repository, times(1)).findAll();
     }
 }

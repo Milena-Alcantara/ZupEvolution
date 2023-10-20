@@ -21,4 +21,8 @@ public class ProfessionalProfileController {
         return profileService.getUsersWithSkill(skillName);
     }
 
+    @GetMapping("/getall")
+    public ResponseEntity<Object> getProfessionalProfile() {
+        return profileService.getAllProfessionalProfiles();
+    }
 }

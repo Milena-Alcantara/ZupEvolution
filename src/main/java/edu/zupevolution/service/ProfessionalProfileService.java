@@ -1,7 +1,6 @@
 package edu.zupevolution.service;
 
 import edu.zupevolution.model.ProfessionalProfileModel;
-import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.ProfessionalProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +35,12 @@ public class ProfessionalProfileService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("É necessário informar uma skill válida");
     }
 
+    public ResponseEntity<Object> getAllProfessionalProfiles() {
+        List<ProfessionalProfileModel> profiles = professionalRepository.findAll();
+        if (!profiles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(profiles);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum perfil profissional encontrado.");
+        }
+    }
 }
