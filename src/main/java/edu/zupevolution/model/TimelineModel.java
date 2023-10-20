@@ -1,32 +1,22 @@
 package edu.zupevolution.model;
 
-import java.util.ArrayList;
+import lombok.Data;
+import org.springframework.stereotype.Component;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
+@Component
 public class TimelineModel {
 
-    private Map<String, List<String>> schedule;
+    private Map<DayOfWeek, List<LocalTime[]>> schedule;
 
     public TimelineModel() {
         schedule = new HashMap<>();
     }
 
-    public boolean addStudyTime(String dayOfWeek, String time) {
-        if (schedule.containsKey(dayOfWeek)) {
-            List<String> times = schedule.get(dayOfWeek);
-            if (!times.contains(time)) {
-                times.add(time);
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            List<String> times = new ArrayList<>();
-            times.add(time);
-            schedule.put(dayOfWeek, times);
-            return true;
-        }
-    }
 }
