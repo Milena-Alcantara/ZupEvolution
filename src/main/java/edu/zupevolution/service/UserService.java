@@ -1,5 +1,6 @@
 package edu.zupevolution.service;
 
+import edu.zupevolution.model.AccessTypeModel;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,4 +65,19 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.OK).body(users);
         }
     }
+
+    public ResponseEntity<Object> updateAccessTypeUserByID(Long id, AccessTypeModel accessTypeModel) {
+        if (id != null || accessTypeModel != null) {
+            Optional<UserModel> locatedUser = userRepository.findById(id);
+            if (locatedUser != null) {
+                UserModel userUpdate = locatedUser.get();
+                userUpdate.setAccess_type(accessTypeModel);
+                userRepository.save(userUpdate);
+                return ResponseEntity.ok(userUpdate);
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Revise os dados informados");
+    }
+
 }

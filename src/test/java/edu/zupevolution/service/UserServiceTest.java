@@ -139,4 +139,36 @@ public class UserServiceTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Usuário não localizado.", response.getBody());
     }
+    @Test
+    @DisplayName("Deve retornar um HTTP status OK ao passar um id e um tipo de acesso válido")
+    public void testOneUpdateAccessTypeUserById(){
+        Optional<UserModel> user = Optional.of(new UserModel(1l, "Milena", new Date(20030621),
+                "milena@gmail.com", "12345678", null));
+        when(userRepository.findById(1L)).thenReturn(user);
+        AccessTypeModel accessTypeModel = new AccessTypeModel(1l,"Admin");
+        ResponseEntity<Object> response = userService.updateAccessTypeUserByID(userValid.getId(),accessTypeModel);
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+        assertEquals(user.get(),response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status BAD_REQUEST quando passar id e tipo de acesso nulos")
+    public void testTwoUpdateAccessTypeUserById(){
+       when(userRepository.findById(userInvalid.getId())).thenReturn(Optional.ofNullable(userInvalid));
+       ResponseEntity response = userService.updateAccessTypeUserByID(userInvalid.getId(),null);
+
+       assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+       assertEquals("Revise os dados informados",response.getBody());
+    }
+
+    @Test
+    @DisplayName("Deve retornar um HTTP status NOT_FOUND quando passar id e tipo de acesso válido")
+    public void testThreeUpdateAccessTypeUserById(){
+        when(userRepository.findById(userValid.getId())).thenReturn(null);
+        AccessTypeModel accessTypeModel = new AccessTypeModel(1l,"Admin");
+        ResponseEntity response = userService.updateAccessTypeUserByID(userValid.getId(),accessTypeModel);
+
+        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
+        assertEquals("Usuário não localizado.",response.getBody());
+    }
 }
