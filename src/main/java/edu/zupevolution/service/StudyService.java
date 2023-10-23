@@ -2,6 +2,7 @@ package edu.zupevolution.service;
 
 import edu.zupevolution.model.StudyModel;
 import edu.zupevolution.repository.StudyRepository;
+import edu.zupevolution.util.TimelineUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,9 @@ import java.util.Optional;
 public class StudyService {
     @Autowired
     private StudyRepository studyRepository;
+
+    @Autowired
+    TimelineUtils timelineUtils;
 
     public ResponseEntity<Object> createStudy(StudyModel studyModel) {
 
@@ -32,6 +36,10 @@ public class StudyService {
         if (studyModel.getTimeline() == null) {
             return new ResponseEntity<>("O campo 'timeline' não pode ser nulo.", HttpStatus.BAD_REQUEST);
         }
+        if (!timelineUtils.isTimelineValid(studyModel.getTimeline())) {
+            return new ResponseEntity<>("Horário indisponível na timeline.", HttpStatus.BAD_REQUEST);
+        }
+
         if (studyModel.getStatus() == null) {
             return new ResponseEntity<>("O campo 'status' não pode ser nulo.", HttpStatus.BAD_REQUEST);
         }
@@ -39,6 +47,7 @@ public class StudyService {
         studyRepository.save(studyModel);
         return ResponseEntity.status(HttpStatus.CREATED).body("Estudo criado.");
     }
+
 
     public ResponseEntity<Object> deleteStudy(Long id) {
         Optional<StudyModel> study = studyRepository.findById(id);
@@ -82,6 +91,7 @@ public class StudyService {
             return new ResponseEntity<>("Estudo não encontrado.", HttpStatus.NOT_FOUND);
         }
     }
+
     public ResponseEntity<Object> getAllStudies() {
         List<StudyModel> studies = studyRepository.findAll();
         if (studies.isEmpty()) {
