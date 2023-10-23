@@ -3,6 +3,7 @@ package edu.zupevolution.service;
 import edu.zupevolution.model.StudyModel;
 import edu.zupevolution.model.TimelineModel;
 import edu.zupevolution.repository.StudyRepository;
+import edu.zupevolution.util.TimelineUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 class StudyServiceTest {
 
@@ -27,8 +26,11 @@ class StudyServiceTest {
     @InjectMocks
     private StudyService studyService;
 
+    @Mock
+    private TimelineUtils timelineUtils;
+
     @BeforeEach
-    public void setUp (){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -40,15 +42,19 @@ class StudyServiceTest {
         studyModel.setDeadline(new Date());
         studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
         studyModel.setGoal("Meta de Teste");
-        TimelineModel existingTimeline = new TimelineModel();
-        existingTimeline.addStudyTime("Segunda", "08:00");
-        existingTimeline.addStudyTime("Terça", "10:00");
-        studyModel.setTimeline(existingTimeline);
+        TimelineModel validTimeline = new TimelineModel();
+        studyModel.setTimeline(validTimeline);
+
         studyModel.setStatus(true);
-        Mockito.when(studyRepository.save(studyModel)).thenReturn(studyModel);
+
+        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+
         ResponseEntity<Object> response = studyService.createStudy(studyModel);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Estudo criado.", response.getBody());
+
+        Mockito.verify(studyRepository).save(studyModel);
+
+        ResponseEntity<Object> expectedResponse = ResponseEntity.status(HttpStatus.CREATED).body("Estudo criado.");
+        assertEquals(expectedResponse, response);
     }
 
     @Test
@@ -60,6 +66,7 @@ class StudyServiceTest {
         studyModel.setGoal("Meta de Teste");
         studyModel.setTimeline(new TimelineModel());
         studyModel.setStatus(true);
+        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
 
         ResponseEntity<Object> response = studyService.createStudy(studyModel);
 
@@ -76,6 +83,7 @@ class StudyServiceTest {
         studyModel.setGoal("Meta de Teste");
         studyModel.setTimeline(new TimelineModel());
         studyModel.setStatus(true);
+        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
 
         ResponseEntity<Object> response = studyService.createStudy(studyModel);
 
@@ -93,6 +101,7 @@ class StudyServiceTest {
         studyModel.setGoal("Meta de Teste");
         studyModel.setTimeline(new TimelineModel());
         studyModel.setStatus(true);
+        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
 
         ResponseEntity<Object> response = studyService.createStudy(studyModel);
 
@@ -109,6 +118,7 @@ class StudyServiceTest {
         studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
         studyModel.setTimeline(new TimelineModel());
         studyModel.setStatus(true);
+        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
 
         ResponseEntity<Object> response = studyService.createStudy(studyModel);
 
@@ -143,6 +153,7 @@ class StudyServiceTest {
         studyModel.setGoal("Meta de Teste");
         studyModel.setTimeline(new TimelineModel());
         studyModel.setStatus(null);
+        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
 
         ResponseEntity<Object> response = studyService.createStudy(studyModel);
 
@@ -150,6 +161,41 @@ class StudyServiceTest {
         assertEquals("O campo 'status' não pode ser nulo.", response.getBody());
     }
 
+    @Test
+    @DisplayName("deve retornar BAD_REQUEST se timeline não for válida")
+    public void testCreateStudyInvalidTimeline() {
+        StudyModel studyModel = new StudyModel();
+        studyModel.setContent("Conteúdo de Teste");
+        studyModel.setDeadline(new Date());
+        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+        studyModel.setGoal("Meta de Teste");
+        TimelineModel invalidTimeline = new TimelineModel();
+        studyModel.setTimeline(invalidTimeline);
+        studyModel.setStatus(true);
+
+        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Horário indisponível na timeline.", response.getBody());
+    }
+
+    @Test
+    @DisplayName("deve retornar BAD_REQUEST se o horário na timeline for inválido")
+    public void testCreateStudyInvalidTimelineTime() {
+        StudyModel studyModel = new StudyModel();
+        studyModel.setContent("Conteúdo de Teste");
+        studyModel.setDeadline(new Date());
+        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+        studyModel.setGoal("Meta de Teste");
+        TimelineModel validTimeline = new TimelineModel();
+        studyModel.setTimeline(validTimeline);
+        studyModel.setStatus(true);
+
+        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Horário indisponível na timeline.", response.getBody());
+    }
 
 
     @Test
@@ -183,10 +229,7 @@ class StudyServiceTest {
         existingStudy.setDeadline(new Date());
         existingStudy.setSkills(new ArrayList<>());
         existingStudy.setGoal("Meta Antiga");
-        TimelineModel existingTimeline = new TimelineModel();
-        existingTimeline.addStudyTime("Segunda", "08:00");
-        existingTimeline.addStudyTime("Terça", "10:00");
-        existingStudy.setTimeline(existingTimeline);
+        existingStudy.setTimeline(new TimelineModel());
         existingStudy.setStatus(false);
 
         StudyModel updatedStudy = new StudyModel();
@@ -194,10 +237,7 @@ class StudyServiceTest {
         updatedStudy.setDeadline(new Date());
         updatedStudy.setSkills(new ArrayList<>());
         updatedStudy.setGoal("Nova Meta");
-        TimelineModel updatedTimeline = new TimelineModel();
-        updatedTimeline.addStudyTime("Quarta", "14:00");
-        updatedTimeline.addStudyTime("Quinta", "16:00");
-        updatedStudy.setTimeline(updatedTimeline);
+        updatedStudy.setTimeline(new TimelineModel());
         updatedStudy.setStatus(true);
 
         Mockito.when(studyRepository.findById(existingStudyId)).thenReturn(Optional.of(existingStudy));
@@ -227,6 +267,7 @@ class StudyServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+
     @Test
     @DisplayName("deve retornar a lista de estudos existentes")
     public void testGetAllStudies() {
@@ -240,6 +281,7 @@ class StudyServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(existingStudies.size(), ((List<StudyModel>) response.getBody()).size());
     }
+
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não houver estudos")
     public void testGetAllStudiesEmpty() {
