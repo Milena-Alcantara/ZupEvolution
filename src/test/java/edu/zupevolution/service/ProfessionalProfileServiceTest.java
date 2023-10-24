@@ -29,6 +29,9 @@ class ProfessionalProfileServiceTest {
     private UserModel userValid;
     private ProfessionalProfileModel profileModelValid;
     private ProfessionalProfileModel profileModelInvalid;
+    private List<Object[]> listUsersValid;
+    private Object[] arrayUser;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -37,6 +40,9 @@ class ProfessionalProfileServiceTest {
         profileModelValid = new ProfessionalProfileModel(1l,userValid,null,null,null,
                 null,null);
         profileModelInvalid = new ProfessionalProfileModel();
+        arrayUser = new Object[]{userValid};
+        listUsersValid = new ArrayList<>();
+        listUsersValid.add(arrayUser);
     }
     @Test
     @DisplayName("Deve retornar um HTTP status CREATED ao passar um perfil profissional com id do usuário válido")
@@ -56,6 +62,36 @@ class ProfessionalProfileServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
         assertEquals("É necessário associar um usuário ao seu perfil profissional.",response.getBody());
     }
+    @Test
+    @DisplayName("Deve retornar um HTTP status OK quando passado uma skill válida ")
+    public void testOneGetUsersWithSkill(){
+        when(repository.getUsersWithSkill(anyString())).thenReturn(listUsersValid);
+        ResponseEntity response = profileService.getUsersWithSkill(anyString());
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+        assertEquals(listUsersValid,response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não localizado perfis.")
+    public void testTwoGetUsersWithSkill(){
+        when(repository.getUsersWithSkill(anyString())).thenReturn(null);
+        ResponseEntity response = profileService.getUsersWithSkill(anyString());
+
+        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
+        assertEquals("Não foi localizado nenhum usuário com a Skill solicitada.",response.getBody());
+    }
+
+    @Test
+    @DisplayName("Deve retornar um HTTP status BAD_REQUEST quando passado uma skill inválida ")
+    public void testThreeGetUsersWithSkill(){
+        when(repository.getUsersWithSkill(null)).thenReturn(listUsersValid);
+        ResponseEntity response = profileService.getUsersWithSkill(null);
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+        assertEquals("É necessário informar uma skill válida",response.getBody());
+    }
+
+
     @Test
     @DisplayName("Deve obter todos os perfis profissionais quando existem perfis")
     void testGetAllProfessionalProfilesWhenProfilesExist() {
