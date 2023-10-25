@@ -29,10 +29,14 @@ public class UserService {
     private boolean dataValidate(UserModel userModel) {
         String EMAIL_PATTERN =
                 "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        String namePattern = "^(?![0-9 ]*$).+";
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Pattern pattern1 = Pattern.compile(namePattern);
 
-        if (userModel.getName() == null || userModel.getBirthday() == null || userModel.getPassword().length() < 8 ||
-                userModel.getPassword().isEmpty() || !userModel.getEmail().matches(String.valueOf(pattern))) {
+        if (userModel.getName() == null || !userModel.getName().matches(String.valueOf(pattern1))
+                || userModel.getBirthday() == null || userModel.getPassword().length() < 8 ||
+                userModel.getPassword() == null || userModel.getEmail() == null
+                || !userModel.getEmail().matches(String.valueOf(pattern))) {
             return false;
         }
         return true;
