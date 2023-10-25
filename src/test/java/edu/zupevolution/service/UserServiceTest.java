@@ -122,7 +122,7 @@ public class UserServiceTest {
         users.add(new UserModel(1L, "Usuário 1", new Date(), "usuario1@gmail.com", "senha1", null));
         when(userRepository.findAll()).thenReturn(users);
 
-        ResponseEntity<Object> response = userService.getAllStudies();
+        ResponseEntity<Object> response = userService.getAllUsers();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<UserModel> responseUsers = (List<UserModel>) response.getBody();
 
