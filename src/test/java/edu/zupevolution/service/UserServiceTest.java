@@ -134,7 +134,7 @@ public class UserServiceTest {
     @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não houver usuários")
     public void testGetAllUsersEmpty() {
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
-        ResponseEntity<Object> response = userService.getAllStudies();
+        ResponseEntity<Object> response = userService.getAllUsers();
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Usuário não localizado.", response.getBody());
