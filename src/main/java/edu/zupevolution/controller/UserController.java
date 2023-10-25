@@ -27,11 +27,11 @@ public class UserController {
     }
     @GetMapping("/getAll")
     public ResponseEntity<Object> getAllStudies() {
-        return userService.getAllStudies();
+        return userService.getAllUsers();
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateAccessTypeUserByID(@PathVariable Long id, @RequestBody AccessTypeModel accessTypeModel){
-        return userService.updateAccessTypeUserByID(id,accessTypeModel);
+    public ResponseEntity<Object> updateAccessTypeUserByID(@PathVariable Long id, @RequestBody AccessTypeModel accessTypeModel) {
+        return userService.updateAccessTypeUserByID(id, accessTypeModel);
     }
 }

@@ -15,9 +15,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class AccessTypeModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "type", nullable = false)
+    @Column(name = "type" )
     private String type;
 }

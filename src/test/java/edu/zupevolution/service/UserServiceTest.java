@@ -60,7 +60,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status OK ao tentar deletar um usuário com email válido")
     public void testOneDeleteUser(){
-        when(userRepository.findByEmailContaining(userValid.getEmail())).thenReturn(Optional.ofNullable(userValid));
+        when(userRepository.findByEmail(userValid.getEmail())).thenReturn(Optional.ofNullable(userValid));
         ResponseEntity response = userService.deleteUser(userValid.getEmail());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -69,7 +69,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status CONFLIT ao tentar deletar um usuário com email inválido")
     public void testTwoDeleteUser(){
-        when(userRepository.findByEmailContaining(userInvalid.getEmail())).thenReturn(Optional.ofNullable(userInvalid));
+        when(userRepository.findByEmail(userInvalid.getEmail())).thenReturn(Optional.ofNullable(userInvalid));
         ResponseEntity response = userService.deleteUser(userInvalid.getEmail());
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -78,7 +78,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND ao tentar deletar um usuário com email inválido")
     public void testThreeDeleteUser(){
-        when(userRepository.findByEmailContaining(userValid.getEmail())).thenReturn(null);
+        when(userRepository.findByEmail(userValid.getEmail())).thenReturn(null);
         ResponseEntity response = userService.deleteUser(userValid.getEmail());
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -90,7 +90,7 @@ public class UserServiceTest {
     public void testOneFindUserByEmail(){
         Optional<UserModel> user = Optional.of(new UserModel(1l, "Milena", new Date(20030621),
                 "milena@gmail.com", "12345678", null));
-        when(userRepository.findByEmailContaining("milena@gmail.com")).thenReturn(user);
+        when(userRepository.findByEmail("milena@gmail.com")).thenReturn(user);
         ResponseEntity response = userService.findUserByEmail("milena@gmail.com");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -99,7 +99,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status CONFLICT ao tentar localizar um usuário com email válido")
     public void testTwoFindUserByEmail(){
-        when(userRepository.findByEmailContaining(userInvalid.getEmail())).thenReturn(Optional.ofNullable(userInvalid));
+        when(userRepository.findByEmail(userInvalid.getEmail())).thenReturn(Optional.ofNullable(userInvalid));
         ResponseEntity response = userService.findUserByEmail(userInvalid.getEmail());
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -109,7 +109,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND ao tentar localizar um usuário com email válido")
     public void testThreeFindUserByEmail(){
-        when(userRepository.findByEmailContaining(userValid.getEmail())).thenReturn(null);
+        when(userRepository.findByEmail(userValid.getEmail())).thenReturn(null);
         ResponseEntity response = userService.findUserByEmail(userValid.getEmail());
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

@@ -31,8 +31,8 @@ public class UserModel {
     @Column(name = "password",length = 30)
     private String password;
 
-    @OneToOne
-    @JoinColumn(name = "id_access_type", referencedColumnName = "id", nullable = true)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_access_type", referencedColumnName = "id")
     private AccessTypeModel access_type;
 
 }
