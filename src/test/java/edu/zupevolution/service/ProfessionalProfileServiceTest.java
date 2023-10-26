@@ -1,10 +1,12 @@
 package edu.zupevolution.service;
 
+import edu.zupevolution.DTO.ProfessionalProfileRequestDTO;
 import edu.zupevolution.model.HardSkillsModel;
 import edu.zupevolution.model.ProfessionalProfileModel;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.HardSkillsRepository;
 import edu.zupevolution.repository.ProfessionalProfileRepository;
+import edu.zupevolution.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,11 +25,15 @@ class ProfessionalProfileServiceTest {
     @Mock
     private ProfessionalProfileRepository repository;
     @Mock
+    private UserRepository userRepository;
+    @Mock
     private HardSkillsRepository hardSkillsRepository;
+
     @InjectMocks
     private ProfessionalProfileService profileService;
     private UserModel userValid;
     private ProfessionalProfileModel profileModelValid;
+    private ProfessionalProfileRequestDTO profileRequestDTO;
     private ProfessionalProfileModel profileModelInvalid;
     private List<Object[]> listUsersValid;
     private Object[] arrayUser;
@@ -39,6 +45,7 @@ class ProfessionalProfileServiceTest {
                 null);
         profileModelValid = new ProfessionalProfileModel(1l,userValid,null,null,null,
                 null,null);
+        profileRequestDTO = new ProfessionalProfileRequestDTO(1l);
         profileModelInvalid = new ProfessionalProfileModel();
         arrayUser = new Object[]{userValid};
         listUsersValid = new ArrayList<>();
@@ -47,20 +54,34 @@ class ProfessionalProfileServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status CREATED ao passar um perfil profissional com id do usuário válido")
     public void testOneCreateProfessionalProfile(){
+        when(userRepository.findById(profileRequestDTO.getId_user())).thenReturn(Optional.ofNullable(userValid));
         when(repository.save(profileModelValid)).thenReturn(profileModelValid);
-        ResponseEntity response = profileService.createProfessionalProfile(profileModelValid);
+        ResponseEntity response = profileService.createProfessionalProfile(profileRequestDTO);
 
         assertEquals(HttpStatus.CREATED,response.getStatusCode());
-        assertEquals("Perfil Profional do usuário criado com sucesso.",response.getBody());
+        assertEquals("Perfil Profissional do usuário criado com sucesso.",response.getBody());
     }
     @Test
     @DisplayName("Deve retornar um HTTP status BAD_REQUEST ao passar um perfil profissional com id do usuário válido")
     public void testTwoCreateProfessionalProfile(){
+        when(userRepository.findById(null)).thenReturn(null);
         when(repository.save(profileModelInvalid)).thenReturn(profileModelInvalid);
-        ResponseEntity response = profileService.createProfessionalProfile(profileModelInvalid);
+        ResponseEntity response = profileService.createProfessionalProfile(profileRequestDTO);
 
         assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
-        assertEquals("É necessário associar um usuário ao seu perfil profissional.",response.getBody());
+        assertEquals("É necessário associar um usuário existente ao seu perfil profissional.",response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status BAD_REQUEST ao passar um perfil profissional com id do usuário com perfil " +
+            "profissional já criado.")
+    public void testThreeCreateProfessionalProfile(){
+        when(userRepository.findById(profileRequestDTO.getId_user())).thenReturn(Optional.ofNullable(userValid));
+        when(repository.existsById(profileRequestDTO.getId_user())).thenReturn(true);
+        when(repository.save(profileModelInvalid)).thenReturn(profileModelInvalid);
+        ResponseEntity response = profileService.createProfessionalProfile(profileRequestDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+        assertEquals("Já existe perfil profissional para este usuário.",response.getBody());
     }
     @Test
     @DisplayName("Deve retornar um HTTP status OK quando passado uma skill válida ")
