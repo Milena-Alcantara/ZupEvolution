@@ -26,7 +26,7 @@ public class UserController {
         return userService.findUserByEmail(email);
     }
     @GetMapping("/getAll")
-    public ResponseEntity<Object> getAllStudies() {
+    public ResponseEntity<Object> getAllUsers() {
         return userService.getAllUsers();
     }
 

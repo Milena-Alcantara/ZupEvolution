@@ -20,10 +20,10 @@ public class HardSkillsModel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn (name = "id_professional_profile", referencedColumnName = "id", nullable = false)
+    @JoinColumn (name = "id_professional_profile", referencedColumnName = "id")
     private ProfessionalProfileModel professionalProfile;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     @ElementCollection

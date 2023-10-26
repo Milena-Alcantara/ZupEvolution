@@ -1,5 +1,6 @@
 package edu.zupevolution.controller;
 
+import edu.zupevolution.DTO.ProfessionalProfileRequestDTO;
 import edu.zupevolution.model.ProfessionalProfileModel;
 import edu.zupevolution.service.ProfessionalProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,11 @@ public class ProfessionalProfileController {
     @Autowired
     private ProfessionalProfileService profileService;
     @PostMapping("/create")
-    public ResponseEntity<Object> createProfessionalProfile(@RequestBody ProfessionalProfileModel profileModel){
-        return profileService.createProfessionalProfile(profileModel);
+    public ResponseEntity<Object> createProfessionalProfile(@RequestBody ProfessionalProfileRequestDTO requestDTO){
+        return profileService.createProfessionalProfile(requestDTO);
     }
-    @GetMapping("/getAllUsersForSkill")
-    public ResponseEntity<Object> getUsersWithSkill(@Param("skillName") String skillName){
+    @GetMapping("/getAllUsersForSkill/{skillName}")
+    public ResponseEntity<Object> getUsersWithSkill(@PathVariable String skillName){
         return profileService.getUsersWithSkill(skillName);
     }
 
