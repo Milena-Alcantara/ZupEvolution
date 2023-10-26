@@ -2,7 +2,6 @@ package edu.zupevolution.service;
 
 import edu.zupevolution.model.HardSkillsModel;
 import edu.zupevolution.model.ProfessionalProfileModel;
-import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.HardSkillsRepository;
 import edu.zupevolution.repository.ProfessionalProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
