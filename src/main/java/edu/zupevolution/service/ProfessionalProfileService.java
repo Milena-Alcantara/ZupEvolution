@@ -38,7 +38,6 @@ public class ProfessionalProfileService {
                 }else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Já existe perfil profissional para este usuário.");
                 }
-
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("É necessário associar um usuário existente ao seu perfil profissional.");
@@ -94,7 +93,5 @@ public class ProfessionalProfileService {
         Optional<HardSkillsModel> profileModel = hardSkillsRepository.findByCertificate(certificate);
         return profileModel.isPresent();
     }
-
-
 
 }
