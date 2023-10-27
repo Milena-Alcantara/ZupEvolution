@@ -3,6 +3,7 @@ package edu.zupevolution.service;
 import edu.zupevolution.model.AccessTypeModel;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.AccessTypeRepository;
+import edu.zupevolution.repository.ProfessionalProfileRepository;
 import edu.zupevolution.repository.UserRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +21,16 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ProfessionalProfileRepository profileRepository;
+    @Mock
+    private StudyService studyService;
     @Mock
     private AccessTypeRepository accessTypeRepository;
     @InjectMocks
@@ -64,6 +70,8 @@ public class UserServiceTest {
     @DisplayName("Deve retornar um HTTP status OK ao tentar deletar um usuário com email válido")
     public void testOneDeleteUser(){
         when(userRepository.findByEmail(userValid.getEmail())).thenReturn(Optional.ofNullable(userValid));
+        doNothing().when(studyService).deleteStudiesAndSkills(userValid.getId());
+        doNothing().when(profileRepository).deleteById(userValid.getId());
         ResponseEntity response = userService.deleteUser(userValid.getEmail());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -81,7 +89,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND ao tentar deletar um usuário com email inválido")
     public void testThreeDeleteUser(){
-        when(userRepository.findByEmail(userValid.getEmail())).thenReturn(null);
+        when(userRepository.findByEmail(null)).thenReturn(null);
         ResponseEntity response = userService.deleteUser(userValid.getEmail());
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -112,7 +120,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND ao tentar localizar um usuário com email válido")
     public void testThreeFindUserByEmail(){
-        when(userRepository.findByEmail(userValid.getEmail())).thenReturn(null);
+        when(userRepository.findByEmail(null)).thenReturn(null);
         ResponseEntity response = userService.findUserByEmail(userValid.getEmail());
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
