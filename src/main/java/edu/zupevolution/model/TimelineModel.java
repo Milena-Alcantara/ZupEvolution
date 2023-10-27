@@ -1,22 +1,31 @@
 package edu.zupevolution.model;
 
-import lombok.Data;
-import org.springframework.stereotype.Component;
+import edu.zupevolution.util.DayOfWeekEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.DayOfWeek;
+
+import javax.persistence.*;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Data
-@Component
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TimelineModel {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private Map<DayOfWeek, List<LocalTime[]>> schedule;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeekEnum dayOfWeek;
 
-    public TimelineModel() {
-        schedule = new HashMap<>();
-    }
-
+    @ElementCollection
+    @CollectionTable(name = "study_times", joinColumns = @JoinColumn(name = "timeline_id"))
+    @Column(name = "study_time")
+    private List<LocalTime> studyTimes;
 }

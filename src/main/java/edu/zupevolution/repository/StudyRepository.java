@@ -1,6 +1,8 @@
 package edu.zupevolution.repository;
 
 import edu.zupevolution.model.StudyModel;
+import edu.zupevolution.model.TimelineModel;
+import edu.zupevolution.util.DayOfWeekEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +19,7 @@ public interface StudyRepository extends JpaRepository<StudyModel, Long> {
     @Modifying
     @Query(value = "DELETE FROM skills WHERE study_skills_id = :studyId", nativeQuery = true)
     void deleteSkillsByStudyId(@Param("studyId") Long studyId);
+
+    List<StudyModel> findByTimeline(TimelineModel timelineModel);
+
 }

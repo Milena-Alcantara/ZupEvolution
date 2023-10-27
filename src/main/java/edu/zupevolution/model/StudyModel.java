@@ -35,8 +35,9 @@ public class StudyModel {
     @Column(name = "goal", nullable = false)
     private String goal;
 
-    @Column(name = "timeline", nullable = false)
-    @Transient
+    @OneToOne
+    @Cascade({org.hibernate.annotations.CascadeType.DELETE, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
+    @JoinColumn(name = "id_timeline", referencedColumnName = "id")
     private TimelineModel timeline;
 
     @Column(name = "status", nullable = false)

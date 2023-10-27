@@ -1,10 +1,11 @@
 package edu.zupevolution.service;
 
 import edu.zupevolution.model.StudyModel;
+import edu.zupevolution.model.TimelineModel;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.StudyRepository;
+import edu.zupevolution.repository.TimelineRepository;
 import edu.zupevolution.repository.UserRepository;
-import edu.zupevolution.util.TimelineUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -22,7 +24,10 @@ public class StudyService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    TimelineUtils timelineUtils;
+    private TimelineRepository timelineRepository;
+    @Autowired
+    private TimelineService timelineService;
+
 
     public ResponseEntity<Object> createStudy(Long userId, StudyModel studyModel) {
         UserModel user = userRepository.findById(userId).orElse(null);
@@ -45,9 +50,11 @@ public class StudyService {
         }
         if (studyModel.getTimeline() == null) {
             return new ResponseEntity<>("O campo 'timeline' não pode ser nulo.", HttpStatus.BAD_REQUEST);
-        }
-        if (!timelineUtils.isTimelineValid(studyModel.getTimeline())) {
-            return new ResponseEntity<>("Horário indisponível na timeline.", HttpStatus.BAD_REQUEST);
+        }else{
+            if(!validateTimelineByUser(userId, studyModel)){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflito de horários: Já existe um cronograma para esse dia da semana e horários.");
+            }
+            timelineRepository.save(studyModel.getTimeline());
         }
 
         if (studyModel.getStatus() == null) {
@@ -56,6 +63,22 @@ public class StudyService {
         studyRepository.save(studyModel);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Estudo criado.");
+    }
+
+    public boolean validateTimelineByUser(Long userId, StudyModel studyModel){
+        List<TimelineModel> conflicts = timelineService.isTimelineConflict(studyModel.getTimeline());
+        if(conflicts!=null){
+            for (TimelineModel timelineModel: conflicts) {
+                //Long idTimeline = timelineModel.getId();
+                List<StudyModel> studiesFound=  studyRepository.findByTimeline(timelineModel);
+                for (StudyModel studies : studiesFound){
+                    if (Objects.equals(studies.getUserModel().getId(), userId)){
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -89,6 +112,11 @@ public class StudyService {
                 study.setGoal(updatedStudy.getGoal());
             }
             if (updatedStudy.getTimeline() != null) {
+                if(!validateTimelineByUser(existingStudy.get().getUserModel().getId(), updatedStudy)){
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflito de horários: Já existe um cronograma para esse dia da semana e horários.");
+                }
+                timelineRepository.save(updatedStudy.getTimeline());
+
                 study.setTimeline(updatedStudy.getTimeline());
             }
             if (updatedStudy.getStatus() != null) {
