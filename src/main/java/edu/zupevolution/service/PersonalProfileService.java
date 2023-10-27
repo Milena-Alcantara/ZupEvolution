@@ -20,10 +20,15 @@ public class PersonalProfileService {
 
         if (existingUserOptional.isPresent()) {
             UserModel existingUser = existingUserOptional.get();
-            existingUser.setPassword(updatedUserModel.getPassword());
+            String newPassword = updatedUserModel.getPassword();
 
-            userRepository.save(existingUser);
-            return ResponseEntity.status(HttpStatus.OK).body("Perfil do usuário atualizado com sucesso!");
+            if (newPassword != null && newPassword.length() >= 8) {
+                existingUser.setPassword(newPassword);
+                userRepository.save(existingUser);
+                return ResponseEntity.status(HttpStatus.OK).body("Perfil do usuário atualizado com sucesso!");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A senha fornecida não atende aos critérios de segurança.");
+            }
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado com o ID fornecido.");
         }

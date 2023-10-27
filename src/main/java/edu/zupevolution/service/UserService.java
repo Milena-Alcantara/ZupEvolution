@@ -78,24 +78,24 @@ public class UserService {
 
     public ResponseEntity<Object> updateAccessTypeUserByID(Long id, AccessTypeModel accessTypeModel) {
         if (id != null && accessTypeModel != null) {
-            Optional<UserModel> locatedUser = userRepository.findById(id);
-            Optional<AccessTypeModel> locatedAcessType = accessTypeRepository.findById(accessTypeModel.getId());
-            if (locatedUser.isPresent() && locatedAcessType.isPresent()) {
-                accessTypeModel.setType(accessTypeModel.getType());
-                accessTypeModel.setId(locatedAcessType.get().getId());
-                if (accessTypeModel.getId()>=4)
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esse tipo deacesso é inválido.");
-                else {
+            if (accessTypeModel.getId()>=4)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esse tipo de acesso é inválido.");
+            else {
+                Optional<UserModel> locatedUser = userRepository.findById(id);
+                Optional<AccessTypeModel> locatedAcessType = accessTypeRepository.findById(accessTypeModel.getId());
+                if (locatedUser.isPresent() && locatedAcessType.isPresent()) {
+                    accessTypeModel.setType(locatedAcessType.get().getType());
+                    accessTypeModel.setId(locatedAcessType.get().getId());
                     accessTypeRepository.save(accessTypeModel);
-                }
-                UserModel userUpdate = locatedUser.get();
-                userUpdate.setAccess_type(accessTypeModel);
-                userRepository.save(userUpdate);
-                return ResponseEntity.ok(userUpdate);
-            } else
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
+
+                    UserModel userUpdate = locatedUser.get();
+                    userUpdate.setAccess_type(accessTypeModel);
+                    userRepository.save(userUpdate);
+                    return ResponseEntity.ok(userUpdate);
+                } else
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
+            }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Revise os dados informados");
     }
-
-    }
+}

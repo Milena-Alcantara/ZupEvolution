@@ -19,18 +19,10 @@ public class HardSkillsModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn (name = "id_professional_profile", referencedColumnName = "id", nullable = false)
-    private ProfessionalProfileModel professionalProfile;
-
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @ElementCollection
-    @CollectionTable(name = "certificates_urls", joinColumns = @JoinColumn(name = "hard_skills_id"))
-    private List<String>certificate;
+    @Column(name = "certificate")
+    private String certificate;
 
-    @ElementCollection
-    @CollectionTable(name = "desired_courses", joinColumns = @JoinColumn(name = "hard_skills_id"))
-    private List<String>desiredCourses;
 }

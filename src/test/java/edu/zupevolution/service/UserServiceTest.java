@@ -2,6 +2,7 @@ package edu.zupevolution.service;
 
 import edu.zupevolution.model.AccessTypeModel;
 import edu.zupevolution.model.UserModel;
+import edu.zupevolution.repository.AccessTypeRepository;
 import edu.zupevolution.repository.UserRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,8 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private AccessTypeRepository accessTypeRepository;
     @InjectMocks
     private UserService userService;
     private UserModel userValid;
@@ -142,10 +145,11 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status OK ao passar um id e um tipo de acesso válido")
     public void testOneUpdateAccessTypeUserById(){
-        Optional<UserModel> user = Optional.of(new UserModel(1l, "Milena", new Date(20030621),
-                "milena@gmail.com", "12345678", null));
-        when(userRepository.findById(1L)).thenReturn(user);
         AccessTypeModel accessTypeModel = new AccessTypeModel(1l,"Admin");
+        Optional<UserModel> user = Optional.of(new UserModel(1l, "Milena", new Date(20030621),
+                "milena@gmail.com", "12345678", accessTypeModel));
+        when(userRepository.findById(1L)).thenReturn(user);
+        when(accessTypeRepository.findById(1l)).thenReturn(Optional.of(accessTypeModel));
         ResponseEntity<Object> response = userService.updateAccessTypeUserByID(userValid.getId(),accessTypeModel);
 
         assertEquals(HttpStatus.OK,response.getStatusCode());
@@ -164,11 +168,24 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND quando passar id e tipo de acesso válido")
     public void testThreeUpdateAccessTypeUserById(){
-        when(userRepository.findById(userValid.getId())).thenReturn(null);
         AccessTypeModel accessTypeModel = new AccessTypeModel(1l,"Admin");
+        userValid.setAccess_type(accessTypeModel);
+        when(userRepository.findById(null)).thenReturn(null);
         ResponseEntity response = userService.updateAccessTypeUserByID(userValid.getId(),accessTypeModel);
 
         assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
         assertEquals("Usuário não localizado.",response.getBody());
+    }
+    @Test
+    @DisplayName("Deve retornar um HTTP status BAD_REQUEST quando passar id válido e tipo de acesso inválido")
+    public void testFourUpdateAccessTypeUserById(){
+        AccessTypeModel accessTypeModel = new AccessTypeModel(5l,null);
+        userValid.setAccess_type(accessTypeModel);
+        when(userRepository.findById(1l)).thenReturn(Optional.ofNullable(userValid));
+        when(accessTypeRepository.findById(5l)).thenReturn(null);
+        ResponseEntity response = userService.updateAccessTypeUserByID(userValid.getId(),accessTypeModel);
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+        assertEquals("Esse tipo de acesso é inválido.",response.getBody());
     }
 }

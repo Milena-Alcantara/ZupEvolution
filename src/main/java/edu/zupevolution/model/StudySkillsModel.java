@@ -19,10 +19,10 @@ public class StudySkillsModel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_hard_skills", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_hard_skills", referencedColumnName = "id")
     private HardSkillsModel hardSkills;
 
     @ManyToOne
-    @JoinColumn(name = "id_study", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_study", referencedColumnName = "id")
     private StudyModel study;
 }
