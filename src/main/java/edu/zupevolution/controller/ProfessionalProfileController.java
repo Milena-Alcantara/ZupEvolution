@@ -4,7 +4,6 @@ import edu.zupevolution.DTO.ProfessionalProfileRequestDTO;
 import edu.zupevolution.model.ProfessionalProfileModel;
 import edu.zupevolution.service.ProfessionalProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +31,4 @@ public class ProfessionalProfileController {
         return profileService.updateProfessionalProfile(id, updatedProfileModel);
     }
 
-    @PutMapping("/updatehardskil")
-    public ResponseEntity<Object> updateHardSkillName(@RequestBody ProfessionalProfileModel updatedProfileModel, @RequestBody String profileHardSkillName, @RequestBody String newHardSkillName) {
-        return profileService.updateHardSkillName(updatedProfileModel, profileHardSkillName, newHardSkillName);
-    }
 }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class ProfessionalProfileService {
    @Autowired
@@ -72,40 +71,30 @@ public class ProfessionalProfileService {
         if (existingProfileOptional.isPresent()) {
             ProfessionalProfileModel existingProfile = existingProfileOptional.get();
             for (HardSkillsModel hardSkill : updatedProfile.getHardSkills()) {
-                hardSkillsRepository.save(hardSkill);
-            }
-            existingProfile.setSoftSkills(updatedProfile.getSoftSkills());
-            existingProfile.setDescription(updatedProfile.getDescription());
-            existingProfile.setStrongPoints(updatedProfile.getStrongPoints());
-            existingProfile.setImprovementPoints(updatedProfile.getImprovementPoints());
-            existingProfile.setHardSkills(updatedProfile.getHardSkills());
+                if (!findByCertificate(hardSkill.getCertificate())){
+                    hardSkillsRepository.save(hardSkill);
+                    existingProfile.setSoftSkills(updatedProfile.getSoftSkills());
+                    existingProfile.setDescription(updatedProfile.getDescription());
+                    existingProfile.setStrongPoints(updatedProfile.getStrongPoints());
+                    existingProfile.setImprovementPoints(updatedProfile.getImprovementPoints());
+                    existingProfile.setHardSkills(updatedProfile.getHardSkills());
 
-            professionalRepository.save(existingProfile);
-            return ResponseEntity.status(HttpStatus.OK).body("Perfil profissional atualizado com sucesso.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Perfil profissional não encontrado.");
-        }
-    }
-
-    public ResponseEntity<Object> updateHardSkillName(ProfessionalProfileModel professionalProfile, String profileHardSkillName, String newHardSkillName) {
-        if (validateAndUpdateHardSkill(profileHardSkillName, newHardSkillName)) {
-            List<HardSkillsModel> hardSkills = professionalProfile.getHardSkills();
-            for (HardSkillsModel hardSkill : hardSkills) {
-                if (hardSkill.getName().equals(profileHardSkillName)) {
-                    hardSkill.setName(newHardSkillName);
-                    HardSkillsModel updatedHardSkill = hardSkillsRepository.save(hardSkill);
-                    return ResponseEntity.status(HttpStatus.OK).body(updatedHardSkill);
+                    professionalRepository.save(existingProfile);
+                    return ResponseEntity.status(HttpStatus.OK).body("Perfil profissional atualizado com sucesso.");
                 }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esse certificado já esta inserido neste perfil.");
             }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Habilidade não encontrada.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nomes de habilidade inválidos.");
-        }
+
+    }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Perfil profissional não encontrado.");
+
     }
 
-    public boolean validateAndUpdateHardSkill(String profileHardSkillName, String newHardSkillName) {
-        return profileHardSkillName != null && newHardSkillName != null;
+    public Boolean findByCertificate(String certificate){
+        Optional<HardSkillsModel> profileModel = hardSkillsRepository.findByCertificate(certificate);
+        return profileModel.isPresent();
     }
+
 
 
 }
