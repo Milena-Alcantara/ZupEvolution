@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/zupevolution/study")
 public class StudyController {
@@ -16,11 +14,10 @@ public class StudyController {
     @Autowired
     private StudyService studyService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> createStudy(@RequestBody StudyModel studyModel) {
-        ResponseEntity<Object> createdStudy = studyService.createStudy(studyModel);
+    @PostMapping("/create/{userId}")
+    public ResponseEntity<Object> createStudy(@PathVariable Long userId, @RequestBody StudyModel studyModel) {
+        ResponseEntity<Object> createdStudy = studyService.createStudy(userId, studyModel);
         return new ResponseEntity<>(createdStudy, HttpStatus.CREATED);
-
     }
 
     @DeleteMapping("/delete/{id}")

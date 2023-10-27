@@ -1,12 +1,16 @@
 package edu.zupevolution.service;
 
 import edu.zupevolution.model.StudyModel;
+import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.StudyRepository;
+import edu.zupevolution.repository.UserRepository;
 import edu.zupevolution.util.TimelineUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +19,17 @@ import java.util.Optional;
 public class StudyService {
     @Autowired
     private StudyRepository studyRepository;
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     TimelineUtils timelineUtils;
 
-    public ResponseEntity<Object> createStudy(StudyModel studyModel) {
+    public ResponseEntity<Object> createStudy(Long userId, StudyModel studyModel) {
+        UserModel user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário com ID " + userId + " não encontrado.");
+        }
+        studyModel.setUserModel(user);
 
         if (studyModel.getContent() == null) {
             return new ResponseEntity<>("O campo 'content' não pode ser nulo.", HttpStatus.BAD_REQUEST);
@@ -43,8 +53,8 @@ public class StudyService {
         if (studyModel.getStatus() == null) {
             return new ResponseEntity<>("O campo 'status' não pode ser nulo.", HttpStatus.BAD_REQUEST);
         }
-
         studyRepository.save(studyModel);
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Estudo criado.");
     }
 
@@ -98,6 +108,15 @@ public class StudyService {
             return new ResponseEntity<>("Estudo não encontrado.", HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(studies, HttpStatus.OK);
+        }
+    }
+    @Transactional
+    public void deleteStudiesAndSkills(@Param("id_user") Long id_user){
+        List<StudyModel> studies = studyRepository.findAllStudies(id_user);
+        for (StudyModel study: studies) {
+            studyRepository.deleteSkillsByStudyId(study.getId());
+            studyRepository.deleteById(study.getId());
+
         }
     }
 }

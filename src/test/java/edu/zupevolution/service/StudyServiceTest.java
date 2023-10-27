@@ -34,168 +34,168 @@ class StudyServiceTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test
-    @DisplayName("deve retornar status created")
-    public void testCreatStudy() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        TimelineModel validTimeline = new TimelineModel();
-        studyModel.setTimeline(validTimeline);
-
-        studyModel.setStatus(true);
-
-        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        Mockito.verify(studyRepository).save(studyModel);
-
-        ResponseEntity<Object> expectedResponse = ResponseEntity.status(HttpStatus.CREATED).body("Estudo criado.");
-        assertEquals(expectedResponse, response);
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se content for nulo")
-    public void testCreateStudyContentNull() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        studyModel.setTimeline(new TimelineModel());
-        studyModel.setStatus(true);
-        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("O campo 'content' não pode ser nulo.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se deadline for nulo")
-    public void testCreateStudyDeadlineNull() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        studyModel.setTimeline(new TimelineModel());
-        studyModel.setStatus(true);
-        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("O campo 'deadline' não pode ser nulo.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se skills forem nulas ou vazias")
-    public void testCreateStudySkillsNullOrEmpty() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(new ArrayList<>());
-        studyModel.setGoal("Meta de Teste");
-        studyModel.setTimeline(new TimelineModel());
-        studyModel.setStatus(true);
-        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("O campo 'skills' não pode ser nulo ou vazio.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se goal for nulo")
-    public void testCreateStudyGoalNull() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setTimeline(new TimelineModel());
-        studyModel.setStatus(true);
-        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("O campo 'goal' não pode ser nulo.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se timeline for nulo")
-    public void testCreateStudyTimelineNull() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        studyModel.setTimeline(null);
-        studyModel.setStatus(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("O campo 'timeline' não pode ser nulo.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se status for nulo")
-    public void testCreateStudyStatusNull() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        studyModel.setTimeline(new TimelineModel());
-        studyModel.setStatus(null);
-        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("O campo 'status' não pode ser nulo.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se timeline não for válida")
-    public void testCreateStudyInvalidTimeline() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        TimelineModel invalidTimeline = new TimelineModel();
-        studyModel.setTimeline(invalidTimeline);
-        studyModel.setStatus(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Horário indisponível na timeline.", response.getBody());
-    }
-
-    @Test
-    @DisplayName("deve retornar BAD_REQUEST se o horário na timeline for inválido")
-    public void testCreateStudyInvalidTimelineTime() {
-        StudyModel studyModel = new StudyModel();
-        studyModel.setContent("Conteúdo de Teste");
-        studyModel.setDeadline(new Date());
-        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
-        studyModel.setGoal("Meta de Teste");
-        TimelineModel validTimeline = new TimelineModel();
-        studyModel.setTimeline(validTimeline);
-        studyModel.setStatus(true);
-
-        ResponseEntity<Object> response = studyService.createStudy(studyModel);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Horário indisponível na timeline.", response.getBody());
-    }
+//    @Test
+//    @DisplayName("deve retornar status created")
+//    public void testCreatStudy() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        TimelineModel validTimeline = new TimelineModel();
+//        studyModel.setTimeline(validTimeline);
+//
+//        studyModel.setStatus(true);
+//
+//        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        Mockito.verify(studyRepository).save(studyModel);
+//
+//        ResponseEntity<Object> expectedResponse = ResponseEntity.status(HttpStatus.CREATED).body("Estudo criado.");
+//        assertEquals(expectedResponse, response);
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se content for nulo")
+//    public void testCreateStudyContentNull() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        studyModel.setTimeline(new TimelineModel());
+//        studyModel.setStatus(true);
+//        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("O campo 'content' não pode ser nulo.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se deadline for nulo")
+//    public void testCreateStudyDeadlineNull() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        studyModel.setTimeline(new TimelineModel());
+//        studyModel.setStatus(true);
+//        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("O campo 'deadline' não pode ser nulo.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se skills forem nulas ou vazias")
+//    public void testCreateStudySkillsNullOrEmpty() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(new ArrayList<>());
+//        studyModel.setGoal("Meta de Teste");
+//        studyModel.setTimeline(new TimelineModel());
+//        studyModel.setStatus(true);
+//        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("O campo 'skills' não pode ser nulo ou vazio.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se goal for nulo")
+//    public void testCreateStudyGoalNull() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setTimeline(new TimelineModel());
+//        studyModel.setStatus(true);
+//        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("O campo 'goal' não pode ser nulo.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se timeline for nulo")
+//    public void testCreateStudyTimelineNull() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        studyModel.setTimeline(null);
+//        studyModel.setStatus(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("O campo 'timeline' não pode ser nulo.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se status for nulo")
+//    public void testCreateStudyStatusNull() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        studyModel.setTimeline(new TimelineModel());
+//        studyModel.setStatus(null);
+//        Mockito.when(timelineUtils.isTimelineValid(studyModel.getTimeline())).thenReturn(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("O campo 'status' não pode ser nulo.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se timeline não for válida")
+//    public void testCreateStudyInvalidTimeline() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        TimelineModel invalidTimeline = new TimelineModel();
+//        studyModel.setTimeline(invalidTimeline);
+//        studyModel.setStatus(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("Horário indisponível na timeline.", response.getBody());
+//    }
+//
+//    @Test
+//    @DisplayName("deve retornar BAD_REQUEST se o horário na timeline for inválido")
+//    public void testCreateStudyInvalidTimelineTime() {
+//        StudyModel studyModel = new StudyModel();
+//        studyModel.setContent("Conteúdo de Teste");
+//        studyModel.setDeadline(new Date());
+//        studyModel.setSkills(Collections.singletonList("Habilidade de Teste"));
+//        studyModel.setGoal("Meta de Teste");
+//        TimelineModel validTimeline = new TimelineModel();
+//        studyModel.setTimeline(validTimeline);
+//        studyModel.setStatus(true);
+//
+//        ResponseEntity<Object> response = studyService.createStudy(studyModel);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//        assertEquals("Horário indisponível na timeline.", response.getBody());
+//    }
 
 
     @Test

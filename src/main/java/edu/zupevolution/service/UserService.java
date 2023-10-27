@@ -3,6 +3,8 @@ package edu.zupevolution.service;
 import edu.zupevolution.model.AccessTypeModel;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.AccessTypeRepository;
+import edu.zupevolution.repository.ProfessionalProfileRepository;
+import edu.zupevolution.repository.StudyRepository;
 import edu.zupevolution.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +22,10 @@ import java.util.regex.Pattern;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private StudyService studyService;
+    @Autowired
+    private ProfessionalProfileRepository professionalProfileRepository;
     @Autowired
     private AccessTypeRepository accessTypeRepository;
 
@@ -49,7 +55,8 @@ public class UserService {
         if (email!=null){
             Optional<UserModel> userLocated = userRepository.findByEmail(email);
             if (userLocated.isPresent()){
-                userRepository.deleteById(userLocated.get().getId());
+                studyService.deleteStudiesAndSkills(userLocated.get().getId());
+                professionalProfileRepository.deleteById(userLocated.get().getId());
                 return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado.");
             }else {
               return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");
