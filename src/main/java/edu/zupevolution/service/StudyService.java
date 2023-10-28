@@ -69,7 +69,6 @@ public class StudyService {
         List<TimelineModel> conflicts = timelineService.isTimelineConflict(studyModel.getTimeline());
         if(conflicts!=null){
             for (TimelineModel timelineModel: conflicts) {
-                //Long idTimeline = timelineModel.getId();
                 List<StudyModel> studiesFound=  studyRepository.findByTimeline(timelineModel);
                 for (StudyModel studies : studiesFound){
                     if (Objects.equals(studies.getUserModel().getId(), userId)){

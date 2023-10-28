@@ -14,8 +14,9 @@ public interface ProfessionalProfileRepository extends JpaRepository<Professiona
             "SELECT u.id, u.name, u.email, pp.description " +
                     "FROM users AS u " +
                     "INNER JOIN professional_profile AS pp ON u.id = pp.id_user " +
-                    "LEFT JOIN hard_skills AS hs ON pp.id = hs.id_professional_profile " +
+                    "LEFT JOIN profile_hard_skills AS phs ON pp.id = phs.id_profile " +
+                    "LEFT JOIN hard_skills AS hs ON phs.id_skill = hs.id " +
                     "LEFT JOIN soft_skills AS ss ON pp.id = ss.professional_profile_id " +
-                    "WHERE hs.name = :skillName OR ss.soft_skills = :skillName")
+                    "WHERE hs.name = :skillName OR ss.soft_skills = :skillName ")
     List<Object[]> getUsersWithSkill(@Param("skillName") String skillName);
 }
