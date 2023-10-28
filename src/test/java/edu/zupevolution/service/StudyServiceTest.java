@@ -3,7 +3,6 @@ package edu.zupevolution.service;
 import edu.zupevolution.model.StudyModel;
 import edu.zupevolution.model.TimelineModel;
 import edu.zupevolution.repository.StudyRepository;
-import edu.zupevolution.util.TimelineUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,9 +24,6 @@ class StudyServiceTest {
     private StudyRepository studyRepository;
     @InjectMocks
     private StudyService studyService;
-
-    @Mock
-    private TimelineUtils timelineUtils;
 
     @BeforeEach
     public void setUp() {
