@@ -13,6 +13,7 @@ import java.util.List;
 
 @Service
 public class TimelineService {
+    @Autowired
     private final TimelineRepository timelineRepository;
 
     @Autowired

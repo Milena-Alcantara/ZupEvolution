@@ -95,7 +95,7 @@ class ProfessionalProfileServiceTest {
     @Test
     @DisplayName("Deve retornar um HTTP status NOT_FOUND quando não localizado perfis.")
     public void testTwoGetUsersWithSkill(){
-        when(repository.getUsersWithSkill(anyString())).thenReturn(null);
+        when(repository.getUsersWithSkill(null)).thenReturn(null);
         ResponseEntity response = profileService.getUsersWithSkill(anyString());
 
         assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
@@ -189,6 +189,29 @@ class ProfessionalProfileServiceTest {
         assert(responseEntity.getStatusCodeValue() == 404);
         assert(responseEntity.getBody().equals("Perfil profissional não encontrado."));
         verify(repository, never()).save(any());
+    }
+    @Test
+    @DisplayName("Não deve atualizar perfil profissional com certificado repetido.")
+    void testUpdateProfessionalProfileWithRepeatedCertificate(){
+        HardSkillsModel hardSkillsModel = new HardSkillsModel(1l,"Java",
+                "www.lorenipsulum.com.br");
+        List<HardSkillsModel> listHardSkills = new ArrayList<>();
+        listHardSkills.add(hardSkillsModel);
+        ProfessionalProfileModel profileModel = new ProfessionalProfileModel();
+        profileModel.setId(1l);
+        profileModel.setHardSkills(listHardSkills);
+        ProfessionalProfileModel profileModel2 = new ProfessionalProfileModel();
+        profileModel2.setHardSkills(listHardSkills);
+        when(repository.findById(1L)).thenReturn(Optional.of(profileModel));
+        when(hardSkillsRepository.findByCertificate(hardSkillsModel.getCertificate())).thenReturn(Optional.of(hardSkillsModel));
+
+        ResponseEntity response = profileService.updateProfessionalProfile(1l,profileModel2);
+
+        assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
+        assertEquals("Esse certificado já esta inserido neste perfil.",response.getBody());
+
+
+
     }
 
 }

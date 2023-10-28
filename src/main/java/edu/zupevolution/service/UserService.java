@@ -4,7 +4,6 @@ import edu.zupevolution.model.AccessTypeModel;
 import edu.zupevolution.model.UserModel;
 import edu.zupevolution.repository.AccessTypeRepository;
 import edu.zupevolution.repository.ProfessionalProfileRepository;
-import edu.zupevolution.repository.StudyRepository;
 import edu.zupevolution.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -53,10 +52,10 @@ public class UserService {
     }
     public ResponseEntity<Object> deleteUser(@Param("email") String email){
         if (email!=null){
-            Optional<UserModel> userLocated = userRepository.findByEmail(email);
-            if (userLocated.isPresent()){
-                studyService.deleteStudiesAndSkills(userLocated.get().getId());
-                professionalProfileRepository.deleteById(userLocated.get().getId());
+            UserModel userLocated = userRepository.findByEmail(email).orElse(null);
+            if (userLocated !=null){
+                studyService.deleteStudiesAndSkills(userLocated.getId());
+                professionalProfileRepository.deleteById(userLocated.getId());
                 return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado.");
             }else {
               return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não localizado.");

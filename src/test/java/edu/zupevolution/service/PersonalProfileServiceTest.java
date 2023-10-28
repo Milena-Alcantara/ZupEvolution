@@ -16,7 +16,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-class PersonalProfileServiceTest {
+class  PersonalProfileServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -66,6 +66,20 @@ class PersonalProfileServiceTest {
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals("Usuário não encontrado com o ID fornecido.", responseEntity.getBody());
     }
+    @Test
+    @DisplayName("deve retornar BAD_REQUEST  quando o perfil do usuário existe mas a senha não é válida")
+    public void testPutPersonalProfileWithPasswordInvalid(){
+        Long userId = 2L;
+        UserModel updatedUserModel = new UserModel();
+        updatedUserModel.setPassword("new");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(updatedUserModel));
+        ResponseEntity<Object> responseEntity = personalProfileService.updatePersonalProfile(userId, updatedUserModel);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("A senha fornecida não atende aos critérios de segurança.", responseEntity.getBody());
+    }
+
     @Test
     @DisplayName("deve retornar o perfil do usuário")
     public void testGetPersonalProfile() {

@@ -35,7 +35,6 @@ class StudyServiceTest {
     @Mock
     private UserRepository userRepository;
 
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
