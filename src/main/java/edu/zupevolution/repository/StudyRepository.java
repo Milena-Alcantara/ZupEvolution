@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface StudyRepository extends JpaRepository<StudyModel, Long> {
-    @Query(nativeQuery = true, value = " SELECT * FROM study_skills WHERE id_user = :id_user")
+    @Query(nativeQuery = true, value = " SELECT * FROM study WHERE id_user = :id_user")
     List<StudyModel> findAllStudies(@Param("id_user") Long id_user);
 
     @Modifying
