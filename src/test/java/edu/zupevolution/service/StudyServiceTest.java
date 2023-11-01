@@ -29,6 +29,8 @@ class StudyServiceTest {
     @InjectMocks
     private StudyService studyService;
     @Mock
+    private StudyService studyServiceTwo;
+    @Mock
     private TimelineRepository timelineRepository;
     @Mock
     private TimelineService timelineService;
@@ -208,6 +210,41 @@ class StudyServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("O campo 'status' não pode ser nulo.", response.getBody());
     }
+    @Test
+    @DisplayName("deve retonar um CONFLIT quando passado um horário já registrado para um mesmo usuário")
+    public void testCreateStudy(){
+        UserModel user = new UserModel();
+        user.setId(1L);
+
+        List<String> skills = new ArrayList<>();
+        skills.add("Java");
+
+        StudyModel studyOne = new StudyModel();
+        studyOne.setId(user.getId());
+        studyOne.setContent("Conteúdo Antigo");
+        studyOne.setDeadline(new Date());
+        studyOne.setSkills(skills);
+        studyOne.setGoal("Meta Antiga");
+        studyOne.setTimeline(new TimelineModel());
+        studyOne.setUserModel(user);
+        studyOne.setStatus(false);
+
+        List<TimelineModel> conflicts = new ArrayList<>();
+        conflicts.add(studyOne.getTimeline());
+
+        List<StudyModel> studiesFound = new ArrayList<>();
+        studiesFound.add(studyOne);
+        when(userRepository.findById(1l)).thenReturn(Optional.ofNullable(user));
+        when(studyRepository.findById(1l)).thenReturn(Optional.ofNullable(studyOne));
+        when(timelineService.isTimelineConflict(studyOne.getTimeline())).thenReturn(conflicts);
+        when(timelineRepository.findByDayOfWeek(studyOne.getTimeline().getDayOfWeek())).thenReturn(conflicts);
+        when(studyRepository.findByTimeline(studyOne.getTimeline())).thenReturn(studiesFound);
+        when(studyServiceTwo.validateTimelineByUser(user.getId(),studyOne)).thenReturn(false);
+        ResponseEntity response = studyService.createStudy(1l,studyOne);
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Conflito de horários: Já existe um cronograma para esse dia da semana e horários.", response.getBody());
+
+    }
 
     @Test
     @DisplayName("deve retornar NO_CONTENT ao excluir estudo existente")
@@ -269,6 +306,38 @@ class StudyServiceTest {
         assertEquals(updatedStudy.getGoal(), returnedStudy.getGoal());
         assertEquals(updatedStudy.getTimeline(), returnedStudy.getTimeline());
         assertEquals(updatedStudy.getStatus(), returnedStudy.getStatus());
+    }
+
+    @Test
+    @DisplayName("deve retonar um CONFLIT quando passado um horário já registrado para um mesmo usuário")
+    public void testUpdateStudy(){
+        UserModel user = new UserModel();
+        user.setId(1L);
+
+        StudyModel studyOne = new StudyModel();
+        studyOne.setId(user.getId());
+        studyOne.setContent("Conteúdo Antigo");
+        studyOne.setDeadline(new Date());
+        studyOne.setSkills(new ArrayList<>());
+        studyOne.setGoal("Meta Antiga");
+        studyOne.setTimeline(new TimelineModel());
+        studyOne.setUserModel(user);
+        studyOne.setStatus(false);
+
+        List<TimelineModel> conflicts = new ArrayList<>();
+        conflicts.add(studyOne.getTimeline());
+
+        List<StudyModel> studiesFound = new ArrayList<>();
+        studiesFound.add(studyOne);
+
+        when(studyRepository.findById(1l)).thenReturn(Optional.ofNullable(studyOne));
+        when(timelineService.isTimelineConflict(studyOne.getTimeline())).thenReturn(conflicts);
+        when(studyRepository.findByTimeline(studyOne.getTimeline())).thenReturn(studiesFound);
+        when(studyServiceTwo.validateTimelineByUser(user.getId(),studyOne)).thenReturn(false);
+        ResponseEntity response = studyService.updateStudy(user.getId(),studyOne);
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Conflito de horários: Já existe um cronograma para esse dia da semana e horários.", response.getBody());
+
     }
 
     @Test
