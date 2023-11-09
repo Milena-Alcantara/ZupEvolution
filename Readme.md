@@ -41,6 +41,10 @@ Desta forma, você pode executar localmente esta API e ter acesso aos seus recur
 servidor http://localhost:8090/swagger-ui/index.html#/ ou através de uma ferramenta de requisição HTTP previamente instalada
 como o Insomnia ou Postman, entre outros.
 
+**Protótipo:** [Figma](https://www.figma.com/file/mvzOKhaOHtUESShxk5C0Io/ZupEvolution?type=design&node-id=0%3A1&mode=design&t=ZgJvtb9SPxEqDqKx-1)
+
+**Pitch de Negócio:** [Apresentação](https://docs.google.com/presentation/d/1H9oulXoZesX5_jjKGY_xnMgXUKFOUK1VbztKMZv_BCg/edit?usp=sharing)
+
 <Hr>
 
 ## Conclusões Finais 📖
